@@ -1,0 +1,106 @@
+\subsection{问题2：患者健康状态评估与风险预测}
+
+\subsubsection{问题分析}
+
+建立科学的健康状态评估体系和疾病风险预测模型是精准管理的基础。需要解决的问题包括：
+\begin{itemize}[itemindent=2em]
+\item 如何选择关键评估指标
+\item 如何建立多维度的综合评分模型
+\item 如何提高疾病风险预测的准确率
+\end{itemize}
+
+\subsubsection{模型建立}
+
+\textbf{1. 健康评估模型}
+
+基于临床指标构建综合健康评分模型：
+
+$$H_i = \sum_{j=1}^{m} w_j \cdot f_j(x_{ij})$$
+
+其中$H_i$为患者$i$的健康评分，$x_{ij}$为患者$i$第$j$个指标的标准化值，$w_j$为第$j$个指标的权重，$f_j$为指标转换函数。
+
+权重通过专家评分法与数据驱动法相结合的方式确定：
+- 收缩压：0.20
+- 空腹血糖：0.18
+- 体质指数（BMI）：0.15
+- 总胆固醇：0.15
+- 低密度脂蛋白（LDL）：0.12
+- 其他指标：0.20
+
+\textbf{2. 风险分层模型}
+
+根据健康评分将患者分为四个风险等级：
+
+\begin{table}[H]
+  \centering
+  \caption{患者风险等级分类标准}
+  \label{tab:risk_levels}
+  \begin{tabularx}{\textwidth}{CCCC}
+    \toprule
+    风险等级 & 健康评分范围 & 特征描述 & 管理策略 \\
+    \midrule
+    低风险（1级） & 80-100 & 各项指标正常，无症状 & 健康教育、定期复查 \\
+    中风险（2级） & 60-79 & 部分指标超标，有轻症 & 加强监测、生活干预 \\
+    高风险（3级） & 40-59 & 多项指标异常，有症状 & 医学治疗、密集监测 \\
+    极高风险（4级） & <40 & 严重并发症风险高 & 专科转诊、急诊预案 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\textbf{3. 疾病风险预测模型}
+
+采用机器学习方法建立疾病风险预测模型。对比了多种算法：
+
+\begin{table}[H]
+  \centering
+  \caption{不同预测算法的性能对比}
+  \label{tab:algorithm_comparison}
+  \begin{tabularx}{\textwidth}{CCCCCC}
+    \toprule
+    算法 & 准确率 & 灵敏度 & 特异度 & AUC & 训练时间 \\
+    \midrule
+    逻辑回归 & 0.832 & 0.791 & 0.867 & 0.856 & 2.3s \\
+    随机森林 & 0.871 & 0.821 & 0.912 & 0.889 & 45.2s \\
+    梯度提升（选择） & 0.879 & 0.833 & 0.921 & 0.902 & 89.6s \\
+    SVM & 0.856 & 0.807 & 0.901 & 0.877 & 156.3s \\
+    神经网络 & 0.867 & 0.814 & 0.908 & 0.885 & 203.5s \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+选择梯度提升（XGBoost）作为最终模型，其预测概率为：
+
+$$P_i = \sigma\left(\sum_{t=1}^{T} f_t(x_i)\right)$$
+
+其中$f_t$为第$t$棵决策树的预测函数，$\sigma$为Sigmoid激活函数，$P_i$为患者$i$未来1年疾病急性发作的概率。
+
+\subsubsection{求解方法}
+
+\textbf{模型训练。} 
+\begin{itemize}[itemindent=2em]
+\item 数据划分：按7:3比例划分训练集和测试集
+\item 特征选择：采用递归特征消除法选择45个最重要特征
+\item 超参数优化：采用网格搜索法进行超参数调优
+\item 交叉验证：采用5折交叉验证评估泛化性能
+\end{itemize}
+
+\textbf{模型评估。} 采用多种指标评估模型性能：
+\begin{itemize}[itemindent=2em]
+\item 准确率（Accuracy）：正确分类样本数/总样本数
+\item 灵敏度（Sensitivity/TPR）：真阳性/(真阳性+假阴性)
+\item 特异度（Specificity/TNR）：真阴性/(真阴性+假阳性)
+\item ROC曲线与AUC值
+\end{itemize}
+
+\subsubsection{结果与分析}
+
+最终模型在测试集上的性能指标如下：
+\begin{itemize}[itemindent=2em]
+\item 准确率：87.9\%
+\item 灵敏度：83.3\%
+\item 特异度：92.1\%
+\item AUC：0.902
+\end{itemize}
+
+模型的混淆矩阵显示，对于有病患者的识别率（灵敏度）较高，能够有效进行风险预警。
+
